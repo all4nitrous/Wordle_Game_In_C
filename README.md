@@ -1,5 +1,5 @@
 # Wordle_Game_In_C
-
+Worldle Game written in C,  instructional video by Dr. Jonas Birch
 # C_Virtual_Machine
 # 💻  Stack<br/>
 ![C](https://img.shields.io/badge/C-00599C?logo=c&logoColor=white)<br/>
