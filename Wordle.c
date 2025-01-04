@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 // Defines the constants for result colors
 #define ResultGreen 1
@@ -10,77 +11,93 @@
 
 // Defines custom types needed for results
 typedef char Result;
-typedef Result[5] Results;
 
-void Example_print_Results(Results);
-Result checkWord(char*, char*);
+bool isin(char, char*);  // Function declaration for isin
+
+void Example_print_results(Result*);  // Correct function declaration
+Result* checkWord(char*, char*);
 Result checkChar(char, int, char*);
-int main();
+int main(int, char**);
 
-void Example_print_results(Results res) {
+// Function to print results
+void Example_print_results(Result *res) {
     int i;
 
-    for (i=0; i<5; i++)
+    for (i = 0; i < 5; i++) {
         switch (res[i]) {
             case ResultGreen:
-                printf("%s\n", "Green");
+                printf("Green\n");
                 break;
             case ResultYellow:
-                printf("%s\n", "Yellow");
+                printf("Yellow\n");
+                break;
+            case ResultRed:
+                printf("Red\n");
+                break;
+            default:
+                printf("unknown: %d\n", res[i]);
+                break;
+        }
     }
 }
 
+// Function to check if a character is in a string
+bool isin(char c, char *str) {
+    int i, size;
+
+    size = strlen(str);  // Calculate string size
+
+    for (i = 0; i < size; i++) {
+        if (str[i] == c) {
+            return true;  // Found the character
+        }
+    }
+    return false;  // Character not found
+}
 
 // Function for checking a character in a guess
 Result checkChar(char guess, int idx, char *word) {
     char correct;
 
-// Makes sure you get correct character for a word
-   correct = word[idx];
-    
-// Checks the result based on your guess    
-if (guess == correct) {
-        return ResultGreen; // Correct letter in the correct position
-    } else {
-        // Checks if the guessed letter exists elsewhere in the word
-        if (strchr(word, guess)) {
-            return ResultYellow; // Correct letter but wrong position
-        }
+    correct = word[idx];
+
+    if (guess == correct) {
+        return ResultGreen;  // Correct letter in the correct position
+    } else if (isin(guess, word)) {
+        return ResultYellow;  // Correct letter but wrong position
     }
 
-    // Returns ResultRed for an incorrect guess
-    return ResultRed;
+    return ResultRed;  // Incorrect letter
 }
 
-Results checkWord(char *guess, char *word) {
-    Results res;
+Result* checkWord(char *guess, char *word) {
+    static Result res[5];  // Static array for storing results
     int i;
 
-    for (i=0; i<5; i++)
-        res[i] = checkChar(guess[i], i, word);
+    for (i = 0; i < 5; i++) {
+        res[i] = checkChar(guess[i], i, word);  // Check each character
+    }
 
     return res;
 }
 
-int main() {
-    // Example usage of checkChar
-    char word[] = "apple"; // Example word
-    char guess = 'p';      // Example guess
-    int idx = 1;           // Index to check
+int main(int argc, char *argv[]) {
+    char *correct, *guess;
+    Result *res;
 
-    // Calls checkChar and prints the result
-    Result result = checkChar(guess, idx, word);
-    switch (result) {
-        case ResultGreen:
-            printf("Result: Green (Correct letter in correct position)\n");
-            break;
-        case ResultYellow:
-            printf("Result: Yellow (Correct letter in wrong position)\n");
-            break;
-        case ResultRed:
-            printf("Result: Red (Incorrect letter)\n");
-            break;
+    if (argc < 3) {
+        fprintf(stderr, "usage: %s CORRECTWORD GUESSWORD\n", argv[0]);
+        return -1;
     }
+
+    correct = argv[1];
+    guess = argv[2];
+
+    // Call checkWord function
+    res = checkWord(guess, correct);
+
+    // Call Example_print_results function
+    Example_print_results(res);
 
     return 0;
 }
